@@ -1,0 +1,3 @@
+include ':wavinterpolation'
+include ':app'
+rootProject.name = "InterpolationLib"
