@@ -10,39 +10,6 @@ using namespace std;
 
 class AudioManager {
 private:
-    void displayInfo(AudioFile file) {
-        AudioFile::riffHeader header = file.header;
-        AudioFile::subChunk1 firstSubChunk = file.firstSubChunk;
-        AudioFile::subChunk2 secondSubChunk = file.secondSubChunk;
-
-        cout << "chunkID: " << header.chunkID[0] << header.chunkID[1] << header.chunkID[2]
-             << header.chunkID[3]
-             << endl;
-        cout << "chunkSize:" << header.chunkSize << endl;
-        cout << "format: " << header.format[0] << header.format[1] << header.format[2]
-             << header.format[3] << endl;
-        cout << "subchunk1ID: " << firstSubChunk.subchunk1ID[0] << firstSubChunk.subchunk1ID[1]
-             << firstSubChunk.subchunk1ID[2] << firstSubChunk.subchunk1ID[3] << endl;
-        cout << "subchunk1Size: " << firstSubChunk.subchunk1Size << endl;
-        cout << "audioFormat: " << firstSubChunk.audioFormat << endl;
-        cout << "numChannels: " << firstSubChunk.numChannels << endl;
-        cout << "sampleRate: " << firstSubChunk.sampleRate << endl;
-        cout << "byteRate: " << firstSubChunk.byteRate << endl;
-        cout << "blockAlign: " << firstSubChunk.blockAlign << endl;
-        cout << "bitsPerSample: " << firstSubChunk.bitsPerSample << endl;
-        cout << "subchunk2ID: " << secondSubChunk.subchunk2ID[0] << secondSubChunk.subchunk2ID[1]
-             << secondSubChunk.subchunk2ID[2] << secondSubChunk.subchunk2ID[3] << endl;
-        cout << "subchunk2Size: " << secondSubChunk.subchunk2Size << endl;
-    }
-
-    void displayDataLayer(AudioFile audioFile) {
-        int numOfSamples = getNumberOfSamples(audioFile);
-
-        for (int i = 0; i < numOfSamples; ++i) {
-            cout << hex << (audioFile.data[i]) << " ";
-        }
-    }
-
     AudioFile convertToAudio(FILE *input) {
         AudioFile result{};
 
@@ -125,13 +92,7 @@ private:
 
         return result;
     }
-
 public:
-    void copy(const char *inputPath, const char *outputFile) {
-        AudioFile audioFile = generateAudioFile(inputPath);
-        writingFile(outputFile, audioFile);
-    }
-
     void audioResize(const char *inputPath, const char *outputFile, double coefficient) {
         cout << "Scaling sound file... ";
         AudioFile audioFile = generateAudioFile(inputPath);
