@@ -10,6 +10,7 @@ using namespace std;
 
 class AudioManager {
 private:
+    // Записує інформацію про бінарний файл у екземпляр класу, що представляє інформацію про .wav файл
     AudioFile convertToAudio(FILE *input) {
         AudioFile result{};
 
@@ -21,6 +22,7 @@ private:
         return result;
     }
 
+    // Записує інформацію про аудіо семпли з бінарного файлу у екземпляр класу, що представляє інформацію про .wav файл
     void getDataLayer(FILE *input, AudioFile &audioFile) {
         int numOfSamples = getNumberOfSamples(audioFile);
 
@@ -30,6 +32,7 @@ private:
         }
     }
 
+    // Повертає екземпляр класу AudioFile, в якому записана вся необхідна інформація
     AudioFile generateAudioFile(const char *filePath) {
         FILE *input = fopen(filePath, "rb");
         if (input == nullptr) {
@@ -44,6 +47,7 @@ private:
         return audio;
     }
 
+    // Записує екземпляр класу AudioFile на диск у вигляді .wav
     void writingFile(const char *outputFile, AudioFile audioFile) {
         FILE *output = fopen(outputFile, "wb");
         fwrite(&audioFile.header, sizeof(audioFile.header), 1, output);
@@ -58,9 +62,10 @@ private:
         fclose(output);
     }
 
-    double interpolationFun(double dist, int16_t *data, int size) {
-        int i = std::floor(dist);
-        dist -= (int) dist;
+    // Повертає значення, що повинно бути у заданій точці інтерпольованого масиву
+    double interpolationFun(double x, int16_t *data, int size) {
+        int i = std::floor(x);
+        double dist = x - i;
 
         int x0 = i;
         int x1 = i + 1;
@@ -72,6 +77,7 @@ private:
         return y0 + dist * (y1 - y0);
     }
 
+    // Повертає кількість семплів у вказаному .wav файлі, представленому як екземпляр AudioFile
     int getNumberOfSamples(const AudioFile &audioFile) const {
         int dataBytes = audioFile.secondSubChunk.subchunk2Size;
         int bytesPerSample = audioFile.firstSubChunk.bitsPerSample / 8;
@@ -79,6 +85,7 @@ private:
         return numOfSamples;
     }
 
+    // Повертає заданий аудіо файл, записуючи семпли у зворотному напрямку
     AudioFile revertAudio(AudioFile file) {
         AudioFile result = file;
         int numOfSamples = getNumberOfSamples(file);
@@ -93,6 +100,7 @@ private:
         return result;
     }
 public:
+    // Розтягує звук заданого .wav файлу у вказану кількість разів
     void audioResize(const char *inputPath, const char *outputFile, double coefficient) {
         cout << "Scaling sound file... ";
         AudioFile audioFile = generateAudioFile(inputPath);
@@ -111,8 +119,8 @@ public:
 
         int16_t *newData = new int16_t[newSize];
         for (int i = 0; i < newSize; i++) {
-            double dist = ((double) i / (double) newSize) * (double) oldSize;
-            newData[i] = interpolationFun(dist, audioFile.data, oldSize);
+            double x = ((double) i / (double) newSize) * (double) oldSize;
+            newData[i] = interpolationFun(x, audioFile.data, oldSize);
         }
 
         out.header = audioFile.header;
